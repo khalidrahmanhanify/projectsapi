@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Get Data from Google Sheets</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+      table {
+        width: 80%;
+        margin: auto;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Google Sheets Data</h2>
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Message</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <script>
+      const apiUrl =
+        "https://script.google.com/macros/s/AKfycbxU5xi3JHpVx8izj8KHkF4ghMgVOustSuHyshpfBgyIhXKavTXmQh2gjGQ4HJtHvDMk/exec";
+
+      fetch(apiUrl)
+        .then((response) => response.json())
+        .then((data) => {
+          let tbody = document.querySelector("#dataTable tbody");
+          tbody.innerHTML = "";
+          data.slice(1).forEach((row) => {
+            // Skip headers (first row)
+            let tr = document.createElement("tr");
+            row.forEach((cell) => {
+              let td = document.createElement("td");
+              td.textContent = cell;
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+          });
+        })
+        .catch((error) => console.error("Error fetching data:", error));
+    </script>
+  </body>
+</html>
