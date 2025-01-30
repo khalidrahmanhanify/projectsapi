@@ -50,7 +50,7 @@
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
-            mode: "cors", // Enables cross-origin requests
+            mode: "no-cors", // Enables cross-origin requests
           })
             .then((response) => response.json())
             .then(
