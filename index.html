@@ -3,36 +3,65 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Get Data from Google Sheets</title>
+    <title>Google Sheets Data as Cards</title>
     <style>
       body {
         font-family: Arial, sans-serif;
         text-align: center;
+        background-color: #f4f4f4;
+        margin: 20px;
       }
-      table {
-        width: 80%;
-        margin: auto;
-        border-collapse: collapse;
+
+      h2 {
+        margin-bottom: 20px;
       }
-      th,
-      td {
-        border: 1px solid black;
+
+      .container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+      }
+
+      .card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        width: 300px;
+        text-align: center;
+      }
+
+      .card img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 10px;
+      }
+
+      .card h3 {
+        margin: 10px 0;
+      }
+
+      .card button {
+        background: #007bff;
+        color: white;
+        border: none;
         padding: 10px;
+        width: 45%;
+        margin: 5px;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+
+      .card button:hover {
+        background: #0056b3;
       }
     </style>
   </head>
   <body>
-    <h2>Google Sheets Data</h2>
-    <table id="dataTable">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Message</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <h2>Projects</h2>
+    <div class="container" id="dataContainer"></div>
 
     <script>
       const apiUrl =
@@ -41,17 +70,36 @@
       fetch(apiUrl)
         .then((response) => response.json())
         .then((data) => {
-          let tbody = document.querySelector("#dataTable tbody");
-          tbody.innerHTML = "";
+          let container = document.querySelector("#dataContainer");
+          container.innerHTML = "";
+
           data.slice(1).forEach((row) => {
-            // Skip headers (first row)
-            let tr = document.createElement("tr");
-            row.forEach((cell) => {
-              let td = document.createElement("td");
-              td.textContent = cell;
-              tr.appendChild(td);
-            });
-            tbody.appendChild(tr);
+            // Skip headers
+            let description = row[0];
+            let repoUrl = row[1];
+            let liveUrl = row[2];
+
+            // Check if the "Image" column has embedded image metadata
+            let imageUrl = "";
+            if (row[3] && row[3].valueType === "IMAGE") {
+              // Use a default image for embedded image case if no direct URL
+              imageUrl = "https://via.placeholder.com/300";
+            } else {
+              // Check if the image URL is available
+              imageUrl = row[3] || "https://via.placeholder.com/300"; // Default placeholder
+            }
+
+            let card = document.createElement("div");
+            card.classList.add("card");
+
+            card.innerHTML = `
+                <img src="${imageUrl}" alt="Project Image">
+                <h3>${description}</h3>
+                <button onclick="window.open('${repoUrl}', '_blank')">Repo URL</button>
+                <button onclick="window.open('${liveUrl}', '_blank')">Live URL</button>
+            `;
+
+            container.appendChild(card);
           });
         })
         .catch((error) => console.error("Error fetching data:", error));
